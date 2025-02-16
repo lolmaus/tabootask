@@ -71,6 +71,11 @@
 
 	
 	"mounts": [
-		"source=${localWorkspaceFolder}/.devcontainer/starship.toml,target=/home/node/.config/starship.toml,type=bind,consistency=cached"
-	]
+		"source=${localWorkspaceFolder}/.devcontainer/starship.toml,target=/home/node/.config/starship.toml,type=bind,consistency=cached",
+		"source=${env:SSH_AUTH_SOCK},target=/ssh-agent,type=bind",
+		"source=${env:HOME}/.gitconfig,target=/home/node/.gitconfig,type=bind"
+	],
+	"remoteEnv": {
+	  "SSH_AUTH_SOCK": "/ssh-agent"
+	}
 }
