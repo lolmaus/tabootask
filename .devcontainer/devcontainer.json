@@ -61,7 +61,7 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "uname -a",
-	"postCreateCommand": "echo 'eval \"$(starship init bash)\"' >> ~/.bashrc",
+	"postCreateCommand": "echo 'eval \"$(starship init bash)\"' >> ~/.bashrc && echo 'source ~/.bash_aliases' >> ~/.bashrc",
 
 	// Configure tool-specific properties.
 	// "customizations": {},
@@ -72,6 +72,7 @@
 	
 	"mounts": [
 		"source=${localWorkspaceFolder}/.devcontainer/starship.toml,target=/home/node/.config/starship.toml,type=bind,consistency=cached",
+		"source=${localWorkspaceFolder}/.devcontainer/.bash_aliases,target=/home/node/.bash_aliases,type=bind,consistency=cached",
 		"source=${env:SSH_AUTH_SOCK},target=/ssh-agent,type=bind",
 		"source=${env:HOME}/.gitconfig,target=/home/node/.gitconfig,type=bind"
 	],
