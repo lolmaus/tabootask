@@ -1,38 +1,50 @@
-# sv
+# Tabootask
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+## Development
 
-## Creating a project
+### Prerequisites
 
-If you're seeing this, you've probably already done this step. Congrats!
+* Docker;
+* A Dev Container capable IDE such as VS Code.
 
-```bash
-# create a new project in the current directory
-npx sv create
+This readme assumes you're using VS Code. You'll have to improvise for another IDE>
 
-# create a new project in my-app
-npx sv create my-app
-```
+### Starting local development
 
-## Developing
+1. Open this codebase in VS Code.
+2. If you haven't already, run `Reopen in Container` in Command Palette. For the first time, it will take a while.
+3. Open a Bash terminal in VS Code. Note that you can use the `Move Terminal into New Window` command for convenienc.
+4. Start Postgres with `docker-compose up` in Bash.
+5. Open another terminal.
+6. If you haven't already, run `pnpm i`.
+7. If you haven't already, run `pnpm exec drizzle-kit migrate` to set up your database schema.
+8. Run `pnpm run dev` in Bash.
+9. Make sure that the 5713 port is forwarded in VS code.
+10. Open http://localhost:5173 in the browser.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### Installing dependencies
 
-```bash
-npm run dev
+This project uses `pnpm`, so:
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+    pnpm i
 
-## Building
+### Accessing Postgres directly
 
-To create a production version of your app:
+This project uses Drizzle, so:
 
-```bash
-npm run build
-```
+    pnpm run db:studio
 
-You can preview the production build with `npm run preview`.
+Then access `https://local.drizzle.studio` in the browser. Note: ditch the `?host=0.0.0.0` part from the URL.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+### Migrating the database
+
+1. Make changes to your `src/lib/server/db/schema.ts`.
+2. To generate a migration:
+
+        pnpm exec drizzle-kit generate --name meaningful-description-of-changes
+
+3. To apply migrations:
+
+        pnpm exec drizzle-kit migrate
+
+4. Don't forget to commit your changes.

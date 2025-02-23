@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1740312399955,
+      "tag": "0000_add-googleId-remove-age",
+      "breakpoints": true
+    }
+  ]
+}
