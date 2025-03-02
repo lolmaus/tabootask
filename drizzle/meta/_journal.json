@@ -5,8 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1740312399955,
-      "tag": "0000_add-googleId-remove-age",
+      "when": 1740415111900,
+      "tag": "0000_initial-schema-with-user-and-session",
       "breakpoints": true
     }
   ]

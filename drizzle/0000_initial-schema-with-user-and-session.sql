@@ -1,13 +1,13 @@
 CREATE TABLE "session" (
 	"id" text PRIMARY KEY NOT NULL,
-	"user_id" text NOT NULL,
+	"user_id" uuid NOT NULL,
 	"expires_at" timestamp with time zone NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "user" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY NOT NULL,
 	"username" text NOT NULL,
-	"password_hash" text NOT NULL,
+	"password_hash" text,
 	"google_id" text,
 	CONSTRAINT "user_username_unique" UNIQUE("username")
 );

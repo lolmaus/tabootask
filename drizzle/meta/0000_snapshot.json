@@ -1,5 +1,5 @@
 {
-  "id": "7bad457e-a71e-4099-8a77-eee1ae7322a4",
+  "id": "1e1bacac-fce4-4f34-9835-2a0a31e9a3f2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -16,7 +16,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -55,7 +55,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true
         },
@@ -69,7 +69,7 @@
           "name": "password_hash",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "google_id": {
           "name": "google_id",
