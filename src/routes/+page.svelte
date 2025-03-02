@@ -8,7 +8,7 @@
 <h2>Sign in</h2>
 <a href="/login/google">Sign in with Google</a>
 
-<h2>Sign out</h2>
+<h2 class="text-red-500">Sign out</h2>
 <form method="post" use:enhance>
     <button>Sign out</button>
 </form>
