@@ -1,28 +1,17 @@
 import { sequence } from '@sveltejs/kit/hooks';
 import { i18n } from '$lib/i18n';
 import type { Handle } from '@sveltejs/kit';
-import * as auth from '$lib/server/session.js';
-
-const handleAuth: Handle = async ({ event, resolve }) => {
-	const sessionToken = event.cookies.get(auth.sessionCookieName);
-	if (!sessionToken) {
-		event.locals.user = null;
-		event.locals.session = null;
-		return resolve(event);
-	}
-
-	const { session, user } = await auth.validateSessionToken(sessionToken);
-	if (session) {
-		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
-	} else {
-		auth.deleteSessionTokenCookie(event);
-	}
-
-	event.locals.user = user;
-	event.locals.session = session;
-
-	return resolve(event);
-};
+import { handleRateLimit } from '$lib/hooks/handle-rate-limit';
+import { handleAuth } from '$lib/hooks/handle-auth';
+import { handleMockDb } from '$lib/hooks/handle-mock-db';
 
 const handleParaglide: Handle = i18n.handle();
-export const handle: Handle = sequence(handleAuth, handleParaglide);
+
+export enum COOKIE_NAMES {
+	auth_session = 'auth_session',
+	mock_db_session = 'mock_db_session',
+	google_oauth_state = 'google_oauth_state',
+	google_code_verifier = 'google_code_verifier',
+}
+
+export const handle: Handle = sequence(handleRateLimit, handleMockDb, handleAuth, handleParaglide);

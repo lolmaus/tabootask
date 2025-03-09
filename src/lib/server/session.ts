@@ -1,81 +1,90 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
-import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
-import { db } from '$lib/server/db';
+import { encodeBase32, encodeHexLowerCase } from '@oslojs/encoding';
 import * as table from '$lib/server/db/schema';
+import { COOKIE_NAMES } from '../../hooks.server';
+import type { Db } from './db/db';
+import assert from 'tiny-invariant';
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
-export const sessionCookieName = 'auth-session';
+export type SessionValidationResult = {
+    session: null;
+    user: null;
+} | {
+    session: table.Session;
+    user: table.User;
+}
 
 export function generateSessionToken() {
-	const bytes = crypto.getRandomValues(new Uint8Array(18));
-	const token = encodeBase64url(bytes);
+	const tokenBytes = new Uint8Array(20);
+	crypto.getRandomValues(tokenBytes); // Modifies `tokenBytes` in place
+	const token = encodeBase32(tokenBytes).toLowerCase();
 	return token;
 }
 
-export async function createSession(token: string, userId: string) {
+export async function createSession(db: Db, token: string, userId: string) {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-	const session: table.Session = {
+
+	const session: table.Session = await db.createSession({
 		id: sessionId,
 		userId,
 		expiresAt: new Date(Date.now() + DAY_IN_MS * 30)
-	};
-	await db.insert(table.session).values(session);
+	});
+
 	return session;
 }
 
-export async function validateSessionToken(token: string) {
+export async function validateSessionToken(db: Db, token: string): Promise<SessionValidationResult> {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-	const [result] = await db
-		.select({
-			// Adjust user table here to tweak returned data
-			user: { id: table.user.id, username: table.user.username },
-			session: table.session
-		})
-		.from(table.session)
-		.innerJoin(table.user, eq(table.session.userId, table.user.id))
-		.where(eq(table.session.id, sessionId));
+	const sessionAndUser = await db.getSessionAndUserBySessionId(sessionId);
 
-	if (!result) {
+	if (!sessionAndUser) {
 		return { session: null, user: null };
 	}
-	const { session, user } = result;
 
-	const sessionExpired = Date.now() >= session.expiresAt.getTime();
+	const sessionExpired = Date.now() >= sessionAndUser.session.expiresAt.getTime();
+
 	if (sessionExpired) {
-		await db.delete(table.session).where(eq(table.session.id, session.id));
+		await db.deleteSessionById(sessionAndUser.session.id);
 		return { session: null, user: null };
 	}
 
-	const renewSession = Date.now() >= session.expiresAt.getTime() - DAY_IN_MS * 15;
+	const renewSession = Date.now() >= sessionAndUser.session.expiresAt.getTime() - DAY_IN_MS * 15;
+
 	if (renewSession) {
-		session.expiresAt = new Date(Date.now() + DAY_IN_MS * 30);
-		await db
-			.update(table.session)
-			.set({ expiresAt: session.expiresAt })
-			.where(eq(table.session.id, session.id));
+		const expiresAt = new Date(Date.now() + DAY_IN_MS * 30);
+
+		const updatedSession = await db.updateSessionById(sessionAndUser.session.id, {expiresAt});
+		assert(updatedSession, 'Expected updatedSession to exist at this point');
+		sessionAndUser.session = updatedSession;
 	}
 
-	return { session, user };
+	return sessionAndUser;
 }
 
-export type SessionValidationResult = Awaited<ReturnType<typeof validateSessionToken>>;
+export async function invalidateSession(db: Db, sessionId: string) {
+	await db.deleteSessionById(sessionId);
+}
 
-export async function invalidateSession(sessionId: string) {
-	await db.delete(table.session).where(eq(table.session.id, sessionId));
+export async function invalidateSessionsOfUser(db, userId: string) {
+	await db.deleteSessionByUserId(userId);
 }
 
 export function setSessionTokenCookie(event: RequestEvent, token: string, expiresAt: Date) {
-	event.cookies.set(sessionCookieName, token, {
+	event.cookies.set(COOKIE_NAMES.auth_session, token, {
 		expires: expiresAt,
-		path: '/'
+		httpOnly: true,
+		path: '/',
+		sameSite: "lax",
 	});
 }
 
 export function deleteSessionTokenCookie(event: RequestEvent) {
-	event.cookies.delete(sessionCookieName, {
-		path: '/'
+	event.cookies.delete(COOKIE_NAMES.auth_session, {
+		httpOnly: true,
+		maxAge: 0,
+		path: '/',
+		sameSite: "lax",
 	});
 }

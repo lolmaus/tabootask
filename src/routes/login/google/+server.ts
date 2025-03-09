@@ -2,25 +2,37 @@ import { generateState, generateCodeVerifier } from "arctic";
 import { google } from "$lib/server/oauth";
 
 import type { RequestEvent } from "@sveltejs/kit";
+import { env } from "$env/dynamic/private";
+import { COOKIE_NAMES } from "../../../hooks.server";
 
 export async function GET(event: RequestEvent): Promise<Response> {
-	const state = generateState();
+	const state = generateState();	
 	const codeVerifier = generateCodeVerifier();
 	const url = google.createAuthorizationURL(state, codeVerifier, ["openid", "profile"]);
 
-	event.cookies.set("google_oauth_state", state, {
+	event.cookies.set(COOKIE_NAMES.google_oauth_state, state, {
 		path: "/",
 		httpOnly: true,
 		maxAge: 60 * 10, // 10 minutes
 		sameSite: "lax"
 	});
 
-	event.cookies.set("google_code_verifier", codeVerifier, {
+	event.cookies.set(COOKIE_NAMES.google_code_verifier, codeVerifier, {
 		path: "/",
 		httpOnly: true,
 		maxAge: 60 * 10, // 10 minutes
 		sameSite: "lax"
 	});
+	
+	if (env.E2E_TEST === 'true') {
+		const mockCode = JSON.stringify({sub: '123', name: 'Vasya Poopkin'});
+		return new Response(null, {
+			status: 302,
+			headers: {
+			Location: `/login/google/callback?code=${mockCode}&state=${state}`
+			}
+		});
+	}
 
 	return new Response(null, {
 		status: 302,

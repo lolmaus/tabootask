@@ -1,21 +1,21 @@
 import { sql } from 'drizzle-orm';
 import { pgTable, serial, text, integer, timestamp, uuid } from 'drizzle-orm/pg-core';
 
-export const user = pgTable('user', {
+export const userTable = pgTable('user', {
 	id: uuid('id').notNull().primaryKey(),
 	username: text('username').notNull().unique(),
 	passwordHash: text('password_hash'),
 	googleId: text('google_id')
 });
 
-export const session = pgTable('session', {
+export const sessionTable = pgTable('session', {
 	id: text('id').primaryKey(),
 	userId: uuid('user_id')
 		.notNull()
-		.references(() => user.id),
+		.references(() => userTable.id),
 	expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'date' }).notNull()
 });
 
-export type Session = typeof session.$inferSelect;
+export type Session = typeof sessionTable.$inferSelect;
 
-export type User = typeof user.$inferSelect;
+export type User = typeof userTable.$inferSelect;

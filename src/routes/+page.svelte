@@ -1,14 +1,13 @@
 <script lang="ts">
 	import { enhance } from "$app/forms";
+    import type { PageData } from "./$types";
+
+    export let data: PageData;
 </script>
 
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
-
-<h2>Sign in</h2>
-<a href="/login/google">Sign in with Google</a>
+<h1>Hi, {data.user.username}!</h1>
 
 <h2>Sign out</h2>
 <form method="post" use:enhance>
-    <button>Sign out</button>
+    <button class="cursor-pointer">Sign out</button>
 </form>
