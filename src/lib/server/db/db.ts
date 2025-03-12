@@ -1,16 +1,23 @@
 import { eq } from 'drizzle-orm';
-import { dbDrizzle } from './db-drizzle';
-import { newMockDb, type MockDbSchema } from './db-mock';
+import { initDrizzle } from './db-drizzle';
+import { mockDbSchema, newMockDb, type MockDbSchema } from './db-mock';
 import { sessionTable, userTable, type Session, type User } from './schema';
 import assert from 'tiny-invariant';
 
 export class Db {
     mockDb?: MockDbSchema;
+    db?: ReturnType<typeof initDrizzle>;
 
     constructor (isMock: boolean) {
         if (isMock) {
             this.mockDb = newMockDb();
+        } else {
+            this.db = initDrizzle();
         }
+    }
+
+    replaceDb(dataRaw: unknown): void {
+        this.mockDb = mockDbSchema.parse(dataRaw);
     }
 
     async createUser (user: {id: string, googleId: string, username: string}): Promise<User> {
@@ -19,7 +26,7 @@ export class Db {
             this.mockDb.users.push(newUser);
             return {...newUser};
         } else {
-            const [newUser] = await dbDrizzle.insert(userTable).values(user).returning();
+            const [newUser] = await this.db!.insert(userTable).values(user).returning();
             assert(newUser, 'Expected newUser to exist at this point');
             return newUser;
         }
@@ -30,7 +37,7 @@ export class Db {
             const user = this.mockDb.users.find(user => user.googleId === googleId);
             return user && {...user};
         } else {
-            const [user] = await dbDrizzle.select().from(userTable).where(eq(userTable.googleId, googleId));
+            const [user] = await this.db!.select().from(userTable).where(eq(userTable.googleId, googleId));
             return user;
         }
     }
@@ -41,7 +48,7 @@ export class Db {
             this.mockDb.sessions.push(newSession);
             return {...newSession};
         } else {
-            const [newSession] = await dbDrizzle.insert(sessionTable).values(session).returning();
+            const [newSession] = await this.db!.insert(sessionTable).values(session).returning();
             assert(newSession, 'Expected newSession to exist at this point');
             return newSession;
         }
@@ -59,7 +66,7 @@ export class Db {
 
             return {user: {...user}, session: {...session}};
         } else {
-            const [result] = await dbDrizzle
+            const [result] = await this.db!
                 .select({
                     user: userTable,
                     session: sessionTable
@@ -76,7 +83,7 @@ export class Db {
         if (this.mockDb) {
             this.mockDb.sessions = this.mockDb.sessions.filter(session => session.id !== sessionId);
         } else {
-            await dbDrizzle.delete(sessionTable).where(eq(sessionTable.id, sessionId))
+            await this.db!.delete(sessionTable).where(eq(sessionTable.id, sessionId))
         }
     }
 
@@ -84,7 +91,7 @@ export class Db {
         if (this.mockDb) {
             this.mockDb.sessions = this.mockDb.sessions.filter(session => session.userId !== userId);
         } else {
-            await dbDrizzle.delete(sessionTable).where(eq(sessionTable.userId, userId));
+            await this.db!.delete(sessionTable).where(eq(sessionTable.userId, userId));
         }
     }
 
@@ -95,7 +102,7 @@ export class Db {
             return session && {...session};
         } else {
             const [session] =
-                await dbDrizzle
+                await this.db!
                     .update(sessionTable)
                     .set(props)
                     .where(eq(sessionTable.id, sessionId)).returning();

@@ -8,7 +8,7 @@ import { type User } from "$lib/server/db/schema";
 import { v7 as uuidv7 } from 'uuid';
 import z from 'zod';
 import { env } from "$env/dynamic/private";
-import { COOKIE_NAMES } from "../../../../hooks.server";
+import { COOKIE_NAMES } from "$lib/hooks/types";
 
 const claimsSchema = z.object({
 	sub: z.string(),
@@ -38,11 +38,11 @@ export async function GET(event: RequestEvent): Promise<Response> {
 
 	let claimsRaw: unknown;
 
-	if (env.E2E_TEST === 'true') {
+	if (env.MOCK_AUTH === 'true') {
 		try {
 			claimsRaw = JSON.parse(code);
 		} catch (e) {
-			throw new Error(`In E2E_TEST mode, the code is expected to be JSON, was: "${code}"`);
+			throw new Error(`In MOCK_AUTH mode, the code is expected to be JSON, was: "${code}"`);
 		}
 	} else {
 		let tokens: OAuth2Tokens;

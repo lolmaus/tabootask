@@ -1,8 +1,8 @@
 import { env } from '$env/dynamic/private';
 import { DbManager } from "$lib/server/db/db-manager";
 import type { Handle } from "@sveltejs/kit";
-import { COOKIE_NAMES } from "../../hooks.server";
 import type { Db } from "$lib/server/db/db";
+import { COOKIE_NAMES } from './types';
 
 const dbManager = new DbManager();
 

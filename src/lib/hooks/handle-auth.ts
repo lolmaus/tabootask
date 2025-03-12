@@ -1,6 +1,6 @@
 import type { Handle } from '@sveltejs/kit';
 import * as auth from '$lib/server/session.js';
-import { COOKIE_NAMES } from '../../hooks.server';
+import { COOKIE_NAMES } from './types';
 
 export const handleAuth: Handle = async ({ event, resolve }) => {
 	const sessionToken = event.cookies.get(COOKIE_NAMES.auth_session);

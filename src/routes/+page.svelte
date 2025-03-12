@@ -5,7 +5,7 @@
     export let data: PageData;
 </script>
 
-<h1>Hi, {data.user.username}!</h1>
+<h1 data-qa="page root title">Hi, {data.user.username}!</h1>
 
 <h2>Sign out</h2>
 <form method="post" use:enhance>

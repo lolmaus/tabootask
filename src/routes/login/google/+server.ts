@@ -3,7 +3,7 @@ import { google } from "$lib/server/oauth";
 
 import type { RequestEvent } from "@sveltejs/kit";
 import { env } from "$env/dynamic/private";
-import { COOKIE_NAMES } from "../../../hooks.server";
+import { COOKIE_NAMES } from "$lib/hooks/types";
 
 export async function GET(event: RequestEvent): Promise<Response> {
 	const state = generateState();	
@@ -24,12 +24,13 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		sameSite: "lax"
 	});
 	
-	if (env.E2E_TEST === 'true') {
-		const mockCode = JSON.stringify({sub: '123', name: 'Vasya Poopkin'});
+	if (env.MOCK_AUTH === 'true') {
+		const mockCode = encodeURIComponent(JSON.stringify({sub: '123', name: 'Vasya Poopkin'}));
+		const Location = `/login/google/callback?code=${mockCode}&state=${state}`;
 		return new Response(null, {
 			status: 302,
 			headers: {
-			Location: `/login/google/callback?code=${mockCode}&state=${state}`
+				Location,
 			}
 		});
 	}

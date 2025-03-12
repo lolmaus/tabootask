@@ -2,9 +2,9 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase32, encodeHexLowerCase } from '@oslojs/encoding';
 import * as table from '$lib/server/db/schema';
-import { COOKIE_NAMES } from '../../hooks.server';
 import type { Db } from './db/db';
 import assert from 'tiny-invariant';
+import { COOKIE_NAMES } from '$lib/hooks/types';
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
@@ -16,15 +16,19 @@ export type SessionValidationResult = {
     user: table.User;
 }
 
-export function generateSessionToken() {
+export function generateSessionToken(): string {
 	const tokenBytes = new Uint8Array(20);
 	crypto.getRandomValues(tokenBytes); // Modifies `tokenBytes` in place
 	const token = encodeBase32(tokenBytes).toLowerCase();
 	return token;
 }
 
+export const getSessionIdFromToken = (token: string): string => {
+	return encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
+}
+
 export async function createSession(db: Db, token: string, userId: string) {
-	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
+	const sessionId = getSessionIdFromToken(token);
 
 	const session: table.Session = await db.createSession({
 		id: sessionId,
@@ -36,7 +40,7 @@ export async function createSession(db: Db, token: string, userId: string) {
 }
 
 export async function validateSessionToken(db: Db, token: string): Promise<SessionValidationResult> {
-	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
+	const sessionId = getSessionIdFromToken(token);
 	const sessionAndUser = await db.getSessionAndUserBySessionId(sessionId);
 
 	if (!sessionAndUser) {
@@ -67,7 +71,7 @@ export async function invalidateSession(db: Db, sessionId: string) {
 	await db.deleteSessionById(sessionId);
 }
 
-export async function invalidateSessionsOfUser(db, userId: string) {
+export async function invalidateSessionsOfUser(db: Db, userId: string) {
 	await db.deleteSessionByUserId(userId);
 }
 
