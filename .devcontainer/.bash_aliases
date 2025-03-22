@@ -13,6 +13,7 @@ alias gco="git checkout"
 alias gb="git branch"
 alias ga="git add"
 alias gA="git add -A"
+alias gl="git --no-pager log --decorate=short --pretty=format:'%Cred%h%Creset - %s %Cgreen(%cr) %C(bold blue)<%an>%C(yellow)%d%Creset' -n5"
 
 # npm
 alias ni="t npm i"
