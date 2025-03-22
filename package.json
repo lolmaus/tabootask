@@ -15,7 +15,7 @@
 		"lint": "prettier --check . && eslint .",
 		"test:unit": "vitest",
 		"test": "pnpm run test:unit -- --run && pnpm run test:e2e",
-		"test:e2e": "MOCK_DB=true MOCK_AUTH=true playwright test --retries 0",
+		"test:e2e": "playwright test --retries 0",
 		"test:live": "playwright test -c playwright-live.config.ts --retries 0",
 		"db:start": "docker compose up",
 		"db:push": "drizzle-kit push",
@@ -25,6 +25,8 @@
 	"devDependencies": {
 		"@eslint/compat": "^1.2.7",
 		"@eslint/js": "^9.22.0",
+		"@fastify/deepmerge": "^3.0.0",
+		"@ngneat/falso": "^7.3.0",
 		"@playwright/test": "^1.51.0",
 		"@sveltejs/adapter-node": "^5.2.12",
 		"@sveltejs/kit": "^2.19.0",

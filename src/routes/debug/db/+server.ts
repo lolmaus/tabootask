@@ -13,6 +13,7 @@ export const GET = async (event) => {
 
 export const POST: RequestHandler = async ({request, locals: {db}}) => {
     const data = await request.json()
+
     db.replaceDb(data);
     
     return new Response(null, {status: 200});

@@ -13,7 +13,7 @@ export default defineConfig(playwrightBaseConfig, {
 		baseURL: 'http://localhost:4173',
 	},
 	webServer: {
-		command: 'npm run build && npm run preview',
+		command: 'MOCK_DB=true MOCK_AUTH=true pnpm run build && pnpm run preview',
 		port: 4173
 	},
 });

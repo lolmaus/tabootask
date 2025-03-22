@@ -4,6 +4,11 @@ import { TokenBucket } from "./utils/bucket";
 const bucket = new TokenBucket<string>(100, 1);
 
 export const handleRateLimit: Handle = async ({ event, resolve }) => {
+	// Skip for /debug/
+	if (event.url.pathname.split('/')[1] === 'debug') {
+		return resolve(event);
+    }
+
     // Note: Assumes X-Forwarded-For will always be defined.
     const clientIP = event.request.headers.get("X-Forwarded-For");
     
