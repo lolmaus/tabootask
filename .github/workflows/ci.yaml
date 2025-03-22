@@ -12,32 +12,44 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Run Lint
-        uses: devcontainers/ci@v0.2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          devcontainerPath: .devcontainer
-          runCmd: "pnpm run lint"
+          node-version: 22
+          cache: 'pnpm'
+      - name: Install Dependencies
+        run: pnpm install
+      - name: Run Lint
+        run: pnpm run lint
 
   check:
-    name: Svelte Check
+    name: Type Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Run Check
-        uses: devcontainers/ci@v0.2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          devcontainerPath: .devcontainer
-          runCmd: "pnpm run check"
+          node-version: 22
+          cache: 'pnpm'
+      - name: Install Dependencies
+        run: pnpm install
+      - name: Run Type Check
+        run: pnpm run check
 
   build_and_test:
     name: Build and Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Build and Test
-        uses: devcontainers/ci@v0.2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          devcontainerPath: .devcontainer
-          runCmd: |
-            pnpm run build &&
-            pnpm run test
+          node-version: 22
+          cache: 'pnpm'
+      - name: Install Dependencies
+        run: pnpm install
+      - name: Build
+        run: pnpm run build
+      - name: Run Tests
+        run: pnpm run test
