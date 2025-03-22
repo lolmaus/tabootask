@@ -1,5 +1,4 @@
 import { generateSessionToken, createSession, setSessionTokenCookie } from '$lib/server/session';
-import { google } from '$lib/server/oauth';
 import { decodeIdToken } from 'arctic';
 
 import type { RequestEvent } from '@sveltejs/kit';
@@ -46,6 +45,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		}
 	} else {
 		let tokens: OAuth2Tokens;
+		const { google } = await import('$lib/server/oauth');
 
 		try {
 			tokens = await google.validateAuthorizationCode(code, codeVerifier);

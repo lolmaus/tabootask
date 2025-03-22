@@ -1,5 +1,4 @@
 import { generateState, generateCodeVerifier } from 'arctic';
-import { google } from '$lib/server/oauth';
 
 import type { RequestEvent } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
@@ -8,7 +7,6 @@ import { COOKIE_NAMES } from '$lib/hooks/types';
 export async function GET(event: RequestEvent): Promise<Response> {
 	const state = generateState();
 	const codeVerifier = generateCodeVerifier();
-	const url = google.createAuthorizationURL(state, codeVerifier, ['openid', 'profile']);
 
 	event.cookies.set(COOKIE_NAMES.google_oauth_state, state, {
 		path: '/',
@@ -33,12 +31,16 @@ export async function GET(event: RequestEvent): Promise<Response> {
 				Location
 			}
 		});
-	}
+	} else {
+		const { google } = await import('$lib/server/oauth');
 
-	return new Response(null, {
-		status: 302,
-		headers: {
-			Location: url.toString()
-		}
-	});
+		const url = google.createAuthorizationURL(state, codeVerifier, ['openid', 'profile']);
+
+		return new Response(null, {
+			status: 302,
+			headers: {
+				Location: url.toString()
+			}
+		});
+	}
 }
