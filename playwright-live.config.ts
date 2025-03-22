@@ -3,6 +3,6 @@ import { playwrightBaseConfig } from './playwright.config';
 
 export default defineConfig(playwrightBaseConfig, {
 	use: {
-		baseURL: 'http://localhost:5173',
-	},
+		baseURL: 'http://localhost:5173'
+	}
 });

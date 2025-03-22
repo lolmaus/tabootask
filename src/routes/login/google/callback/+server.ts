@@ -1,25 +1,25 @@
-import { generateSessionToken, createSession, setSessionTokenCookie } from "$lib/server/session";
-import { google } from "$lib/server/oauth";
-import { decodeIdToken } from "arctic";
+import { generateSessionToken, createSession, setSessionTokenCookie } from '$lib/server/session';
+import { google } from '$lib/server/oauth';
+import { decodeIdToken } from 'arctic';
 
-import type { RequestEvent } from "@sveltejs/kit";
-import type { OAuth2Tokens } from "arctic";
-import { type User } from "$lib/server/db/schema";
+import type { RequestEvent } from '@sveltejs/kit';
+import type { OAuth2Tokens } from 'arctic';
+import { type User } from '$lib/server/db/schema';
 import { v7 as uuidv7 } from 'uuid';
 import z from 'zod';
-import { env } from "$env/dynamic/private";
-import { COOKIE_NAMES } from "$lib/hooks/types";
+import { env } from '$env/dynamic/private';
+import { COOKIE_NAMES } from '$lib/hooks/types';
 
 const claimsSchema = z.object({
 	sub: z.string(),
-	name: z.string(),
+	name: z.string()
 });
 
 type Claims = z.infer<typeof claimsSchema>;
 
 export async function GET(event: RequestEvent): Promise<Response> {
-	const code = event.url.searchParams.get("code");
-	const state = event.url.searchParams.get("state");
+	const code = event.url.searchParams.get('code');
+	const state = event.url.searchParams.get('state');
 	const storedState = event.cookies.get(COOKIE_NAMES.google_oauth_state) ?? null;
 	const codeVerifier = event.cookies.get(COOKIE_NAMES.google_code_verifier) ?? null;
 	const db = event.locals.db;
@@ -46,7 +46,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		}
 	} else {
 		let tokens: OAuth2Tokens;
-		
+
 		try {
 			tokens = await google.validateAuthorizationCode(code, codeVerifier);
 		} catch (e) {
@@ -54,8 +54,8 @@ export async function GET(event: RequestEvent): Promise<Response> {
 				status: 400
 			});
 		}
-	
-		claimsRaw = decodeIdToken(tokens.idToken()) as {sub: string, name: string};
+
+		claimsRaw = decodeIdToken(tokens.idToken()) as { sub: string; name: string };
 	}
 
 	const claims: Claims = claimsSchema.parse(claimsRaw);
@@ -73,13 +73,13 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		return new Response(null, {
 			status: 302,
 			headers: {
-				Location: "/"
+				Location: '/'
 			}
 		});
 	}
 
 	const id = uuidv7();
-	user = await db.createUser({id, googleId, username});
+	user = await db.createUser({ id, googleId, username });
 	const sessionToken = generateSessionToken();
 	const session = await createSession(db, sessionToken, user.id);
 
@@ -88,7 +88,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	return new Response(null, {
 		status: 302,
 		headers: {
-			Location: "/"
+			Location: '/'
 		}
 	});
 }

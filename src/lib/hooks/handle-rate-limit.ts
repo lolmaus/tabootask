@@ -1,5 +1,5 @@
 import type { Handle } from '@sveltejs/kit';
-import { TokenBucket } from "./utils/bucket";
+import { TokenBucket } from './utils/bucket';
 
 const bucket = new TokenBucket<string>(100, 1);
 
@@ -7,24 +7,21 @@ export const handleRateLimit: Handle = async ({ event, resolve }) => {
 	// Skip for /debug/
 	if (event.url.pathname.split('/')[1] === 'debug') {
 		return resolve(event);
-    }
+	}
 
-    // Note: Assumes X-Forwarded-For will always be defined.
-    const clientIP = event.request.headers.get("X-Forwarded-For");
-    
-    if (clientIP === null) {
-        return resolve(event);
-    }
+	// Note: Assumes X-Forwarded-For will always be defined.
+	const clientIP = event.request.headers.get('X-Forwarded-For');
 
-    const cost: number =
-        (event.request.method === "GET" || event.request.method === "OPTIONS")
-            ? 1
-            : 3;
+	if (clientIP === null) {
+		return resolve(event);
+	}
 
-    if (!bucket.consume(clientIP, cost)) {
-        return new Response("Too many requests", {
-            status: 429
-        });
-    }
-    return resolve(event);
+	const cost: number = event.request.method === 'GET' || event.request.method === 'OPTIONS' ? 1 : 3;
+
+	if (!bucket.consume(clientIP, cost)) {
+		return new Response('Too many requests', {
+			status: 429
+		});
+	}
+	return resolve(event);
 };

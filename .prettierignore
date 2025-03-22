@@ -6,3 +6,6 @@ yarn.lock
 
 # IDE
 .history
+
+# Migrations
+/drizzle/

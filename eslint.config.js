@@ -33,7 +33,7 @@ export default ts.config(
 	},
 	{
 		rules: {
-			"@typescript-eslint/no-unused-vars": ["error", { "caughtErrors": "none" }],
+			'@typescript-eslint/no-unused-vars': ['error', { caughtErrors: 'none' }]
 		}
 	}
 );

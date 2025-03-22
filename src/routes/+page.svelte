@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { enhance } from "$app/forms";
-    import type { PageData } from "./$types";
+	import { enhance } from '$app/forms';
+	import type { PageData } from './$types';
 
-    export let data: PageData;
+	export let data: PageData;
 </script>
 
 <h1 data-qa="page root title">Hi, {data.user.username}!</h1>
 
 <h2>Sign out</h2>
 <form method="post" use:enhance>
-    <button class="cursor-pointer">Sign out</button>
+	<button class="cursor-pointer">Sign out</button>
 </form>

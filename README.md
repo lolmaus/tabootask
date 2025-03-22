@@ -4,8 +4,8 @@
 
 ### Prerequisites
 
-* Docker;
-* A Dev Container capable IDE such as VS Code.
+- Docker;
+- A Dev Container capable IDE such as VS Code.
 
 This readme assumes you're using VS Code. You'll have to improvise for another IDE>
 
@@ -38,13 +38,13 @@ Then access `https://local.drizzle.studio` in the browser. Note: ditch the `?hos
 
 ### Migrating the database
 
-1. Make changes to your `src/lib/server/db/schema.ts`.
-2. To generate a migration:
+1.  Make changes to your `src/lib/server/db/schema.ts`.
+2.  To generate a migration:
 
         pnpm exec drizzle-kit generate --name meaningful-description-of-changes
 
-3. To apply migrations:
+3.  To apply migrations:
 
         pnpm exec drizzle-kit migrate
 
-4. Don't forget to commit your changes.
+4.  Don't forget to commit your changes.

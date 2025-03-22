@@ -8,13 +8,15 @@ import { COOKIE_NAMES } from '$lib/hooks/types';
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
-export type SessionValidationResult = {
-    session: null;
-    user: null;
-} | {
-    session: table.Session;
-    user: table.User;
-}
+export type SessionValidationResult =
+	| {
+			session: null;
+			user: null;
+	  }
+	| {
+			session: table.Session;
+			user: table.User;
+	  };
 
 export function generateSessionToken(): string {
 	const tokenBytes = new Uint8Array(20);
@@ -25,7 +27,7 @@ export function generateSessionToken(): string {
 
 export const getSessionIdFromToken = (token: string): string => {
 	return encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-}
+};
 
 export async function createSession(db: Db, token: string, userId: string) {
 	const sessionId = getSessionIdFromToken(token);
@@ -39,7 +41,10 @@ export async function createSession(db: Db, token: string, userId: string) {
 	return session;
 }
 
-export async function validateSessionToken(db: Db, token: string): Promise<SessionValidationResult> {
+export async function validateSessionToken(
+	db: Db,
+	token: string
+): Promise<SessionValidationResult> {
 	const sessionId = getSessionIdFromToken(token);
 	const sessionAndUser = await db.getSessionAndUserBySessionId(sessionId);
 
@@ -59,7 +64,7 @@ export async function validateSessionToken(db: Db, token: string): Promise<Sessi
 	if (renewSession) {
 		const expiresAt = new Date(Date.now() + DAY_IN_MS * 30);
 
-		const updatedSession = await db.updateSessionById(sessionAndUser.session.id, {expiresAt});
+		const updatedSession = await db.updateSessionById(sessionAndUser.session.id, { expiresAt });
 		assert(updatedSession, 'Expected updatedSession to exist at this point');
 		sessionAndUser.session = updatedSession;
 	}
@@ -80,7 +85,7 @@ export function setSessionTokenCookie(event: RequestEvent, token: string, expire
 		expires: expiresAt,
 		httpOnly: true,
 		path: '/',
-		sameSite: "lax",
+		sameSite: 'lax'
 	});
 }
 
@@ -89,6 +94,6 @@ export function deleteSessionTokenCookie(event: RequestEvent) {
 		httpOnly: true,
 		maxAge: 0,
 		path: '/',
-		sameSite: "lax",
+		sameSite: 'lax'
 	});
 }

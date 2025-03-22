@@ -1,4 +1,3 @@
-
 interface Bucket {
 	count: number;
 	refilledAt: number;
@@ -60,7 +59,7 @@ export class TokenBucket<_Key> {
 
 		bucket.count -= cost;
 		this.storage.set(key, bucket);
-        
+
 		return true;
 	}
 }
