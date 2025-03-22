@@ -2,13 +2,13 @@ import { z } from "zod";
 import { createSchemaFactory } from 'drizzle-zod';
 import { sessionTable, userTable } from "./schema";
 
-const { createInsertSchema } = createSchemaFactory({
+const { createSelectSchema } = createSchemaFactory({
     coerce: true
   });
 
 export const mockDbSchema = z.object({
-    users: z.array(createInsertSchema(userTable)),
-    sessions: z.array(createInsertSchema(sessionTable)),
+    users: z.array(createSelectSchema(userTable)),
+    sessions: z.array(createSelectSchema(sessionTable)),
 })
 
 export type MockDbSchema = z.infer<typeof mockDbSchema>;
