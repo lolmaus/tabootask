@@ -1,6 +1,7 @@
 name: CI
 
 env:
+  BASE_URL: 'http://localhost:4173'
   GOOGLE_CLIENT_ID:
   GOOGLE_CLIENT_SECRET:
 
