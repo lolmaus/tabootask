@@ -1,0 +1,6 @@
+# dotenvenv files
+.env*
+!.env.example
+
+# sample data for convex
+/*.jsonl

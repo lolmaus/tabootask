@@ -1,0 +1,34 @@
+{
+  "name": "@tabootask/backend",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./convex/_generated/api": {
+      "types": "./convex/_generated/api.d.ts",
+      "import": "./convex/_generated/api.js"
+    }
+  },
+  "scripts": {
+    "dev": "sh -c '[ -z \"$ENV\" ] || [ \"$ENV\" = \"\" ] || [ \"$ENV\" = \"local\" ] && exec convex dev || exit 0'",
+    "codegen": "convex codegen",
+    "dashboard": "convex dashboard",
+    "deploy": "dotenv -e .env.${ENV:-local} -- convex deploy",
+    "import": "convex import",
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@tabootask/eslint-config": "workspace:*",
+    "@tabootask/typescript-config": "workspace:*",
+    "@types/node": "^22.15.3",
+    "@types/react": "19.1.0",
+    "@types/react-dom": "19.1.1",
+    "dotenv-cli": "^10.0.0",
+    "eslint": "^9.31.0",
+    "typescript": "5.8.2"
+  },
+  "dependencies": {
+    "convex": "^1.25.4"
+  }
+}
