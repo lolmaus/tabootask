@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "dotenv -e .env.${ENV:-local} -- next dev --turbopack",
     "build": "dotenv -e .env.${ENV:-local} -- next build",
-    "start": "next start",
+    "start": "dotenv -e .env.${ENV:-local} -- next start",
     "lint": "next lint --max-warnings 0",
     "check-types": "tsc --noEmit"
   },

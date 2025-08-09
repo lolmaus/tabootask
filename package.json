@@ -6,6 +6,7 @@
     "dashboard": "turbo run dashboard",
     "deploy": "turbo run deploy",
     "dev": "turbo run dev",
+    "start": "turbo run start",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"
