@@ -14,7 +14,7 @@
     "codegen": "convex codegen",
     "dashboard": "convex dashboard",
     "deploy": "dotenv -e .env.${ENV:-local} -- convex deploy",
-    "import": "convex import",
+    "import": "dotenv -e .env.${ENV:-local} -- convex import",
     "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit"
   },
