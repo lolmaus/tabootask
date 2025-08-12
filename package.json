@@ -2,22 +2,39 @@
   "name": "tabootask",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dashboard": "turbo run dashboard",
-    "deploy": "turbo run deploy",
-    "dev": "turbo run dev",
-    "start": "turbo run start",
+    "//dashboard": ": # Opens the Convex dashboard in the browser",
+    "dashboard:dev": "dotenv -e .env.dev -e .env.dev.local -- turbo run dashboard --filter @tabootask/backend",
+    "dashboard:prod": "dotenv -e .env.prod -e .env.prod.local -- turbo run dashboard --filter @tabootask/backend",
+
+    "//deploy": ": # Deploys Convex schema and functions to server",
+    "deploy:dev": "dotenv -e .env.dev -e .env.dev.local -- turbo run deploy --filter @tabootask/backend",
+    "deploy:prod": "dotenv -e .env.prod -e .env.prod.local -- turbo run deploy --filter @tabootask/backend",
+
+    "//watch": ": # Starts local dev server(s) for development",
+    "watch:dev": "dotenv -e .env.dev -e .env.dev.local -- turbo run dev",
+    "watch:prod": "dotenv -e .env.prod -e .env.prod.local -- turbo run start --filter @tabootask/frontend",
+    "watch:test": "dotenv -e .env.test -e .env.test.local -- turbo run dev",
+
+    "//test:e2e": ": # Runs E2E tests with Playwright, requires `watch:test` to run in parallel terminal",
+    "test:e2e": "dotenv -e .env.test -e .env.test.local -- turbo run test --filter @tabootask/test-e2e",
+
+    "//serve:prod": ": # Builds the frontend and serves it with Node in production mode",
+    "build:prod": "dotenv -e .env.prod -e .env.prod.local -- turbo run build --filter @tabootask/frontend",
+    "serve:prod": "dotenv -e .env.prod -e .env.prod.local -- turbo run start --filter @tabootask/frontend",
+
+    "//utils": "",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
+    "dotenv-cli": "^10.0.0",
     "prettier": "^3.6.2",
     "turbo": "^2.5.5",
-    "typescript": "5.8.3"
+    "typescript": "5.9.2"
   },
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@10.14.0",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   }
 }

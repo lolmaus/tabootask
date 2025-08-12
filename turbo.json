@@ -1,11 +1,12 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
-  "globalEnv": ["ENV"],
+  "globalEnv": [],
+
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "env":  ["CONVEX_*"],
+      "dependsOn": ["^build", "^codegen"],
+      "env": ["CONVEX_*"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
@@ -22,16 +23,22 @@
     },
     "dashboard": {
       "cache": false,
-      "env":  ["CONVEX_*"]
+      "env": ["CONVEX_*"]
     },
     "dev": {
       "cache": false,
-      "env":  ["CONVEX_*"],
+      "dependsOn": ["^dev"],
+      "env": ["CONVEX_*", "IS_TEST"],
       "persistent": true
     },
     "deploy": {
       "cache": false,
-      "env":  ["CONVEX_*"]
-    }
+      "env": ["CONVEX_*"]
+    },
+    "test": {
+      "cache": false,
+      "env": []
+    },
+    "codegen": {}
   }
 }
