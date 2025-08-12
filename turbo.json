@@ -38,6 +38,7 @@
     "test": {
       "cache": false,
       "env": []
-    }
+    },
+    "codegen": {}
   }
 }

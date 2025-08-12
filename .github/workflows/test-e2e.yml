@@ -44,25 +44,27 @@ jobs:
         run: pnpm --filter @tabootask/test-e2e exec playwright install --with-deps
 
       - name: Start local Convex backend
-        run: |
-          pnpm run watch:test --filter @tabootask/backend &
-          BACKEND_PID=$!
-          pnpx wait-on http://localhost:3210
+        uses: JarvusInnovations/background-action@v1
+        with:
+          run: pnpm run watch:test --filter @tabootask/backend &
+          wait-on: http://localhost:3210
+          wait-for: 180s  # Adjust based on typical startup time; prevents indefinite hangs
+          tail: true  # Streams logs live for debugging
+          log-output-if: failure  # Logs full output only on failure (exit-early or timeout)
+          log-output: true  # Captures both stdout/stderr on failure
 
       - name: Start frontend in production mode
-        run: |
-          pnpm run serve:prod &
-          FRONTEND_PID=$!
-          pnpx wait-on http://localhost:3000
+        uses: JarvusInnovations/background-action@v1
+        with:
+          run: pnpm run serve:prod &
+          wait-on: http://localhost:3000
+          wait-for: 180s
+          tail: true
+          log-output-if: failure
+          log-output: true
 
       - name: Run E2E tests
         run: pnpm run test:e2e
-
-      - name: Cleanup processes
-        if: always()
-        run: |
-          kill $BACKEND_PID || true
-          kill $FRONTEND_PID || true
 
       - name: Deploy Playwright Report to GitHub Pages
         if: always()
