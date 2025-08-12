@@ -1,0 +1,67 @@
+name: Test PR
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    container: mcr.microsoft.com/playwright:v1.54.2-noble
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start local Convex backend
+        run: |
+          pnpm run watch:test --filter @tabootask/backend | tee backend.log &
+          BACKEND_PID=$!
+          count=0
+          while ! grep -q "Convex functions ready!" backend.log && [ $count -lt 60 ]; do sleep 1; ((count++)); done
+          if [ $count -eq 60 ]; then echo "Timeout waiting for backend"; exit 1; fi
+
+      - name: Start frontend in production mode
+        run: |
+          pnpm run serve:prod | tee frontend.log &
+          FRONTEND_PID=$!
+          count=0
+          while ! grep -q "Ready in" frontend.log && [ $count -lt 60 ]; do sleep 1; ((count++)); done
+          if [ $count -eq 60 ]; then echo "Timeout waiting for frontend"; exit 1; fi
+
+      - name: Run E2E tests
+        run: pnpm run test:e2e
+
+      - name: Cleanup processes
+        if: always()
+        run: |
+          kill $BACKEND_PID || true
+          kill $FRONTEND_PID || true
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload server logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-logs
+          path: |
+            backend.log
+            frontend.log
+          retention-days: 30

@@ -1,7 +1,8 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
-  "globalEnv": ["ENV"],
+  "globalEnv": [],
+
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -26,12 +27,16 @@
     },
     "dev": {
       "cache": false,
-      "env":  ["CONVEX_*"],
+      "env":  ["CONVEX_*", "IS_TEST"],
       "persistent": true
     },
     "deploy": {
       "cache": false,
       "env":  ["CONVEX_*"]
+    },
+    "test": {
+      "cache": false,
+      "env":  []
     }
   }
 }

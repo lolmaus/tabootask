@@ -4,29 +4,28 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "dotenv -e .env.${ENV:-local} -- next dev --turbopack",
-    "build": "dotenv -e .env.${ENV:-local} -- next build",
-    "start": "dotenv -e .env.${ENV:-local} -- next start",
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
     "lint": "next lint --max-warnings 0",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "convex": "^1.25.4",
     "next": "15.4.6",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
   },
   "devDependencies": {
     "@tabootask/backend": "workspace:*",
     "@tabootask/eslint-config": "workspace:*",
     "@tabootask/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "dotenv-cli": "^10.0.0",
-    "eslint": "^9",
+    "@types/node": "20",
+    "@types/react": "19.1.10",
+    "@types/react-dom": "19.1.7",
+    "eslint": "9.33.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "5.9.2"
   }
 }
