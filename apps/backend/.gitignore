@@ -4,3 +4,6 @@
 
 # sample data for convex
 /*.jsonl
+
+# Convex generated folder
+convex/_generated/
