@@ -134,7 +134,7 @@ importers:
   packages/test-e2e:
     devDependencies:
       '@playwright/test':
-        specifier: ^1.54.2
+        specifier: 1.54.2
         version: 1.54.2
       '@tabootask/eslint-config':
         specifier: workspace:*
