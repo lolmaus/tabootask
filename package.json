@@ -19,6 +19,7 @@
     "test:e2e": "dotenv -e .env.test -e .env.test.local -- turbo run test --filter @tabootask/test-e2e",
 
     "//serve:prod": ": # Builds the frontend and serves it with Node in production mode",
+    "build:prod": "dotenv -e .env.prod -e .env.prod.local -- turbo run build --filter @tabootask/frontend",
     "serve:prod": "dotenv -e .env.prod -e .env.prod.local -- turbo run start --filter @tabootask/frontend",
 
     "//utils": "",
