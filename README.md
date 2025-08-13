@@ -31,3 +31,135 @@ To start an `package.json` script with a specfic dotenv file, use the `dotenv` c
 ```sh
 dotenv - .env.dev -- pnpm run dev
 ```
+
+## Deployment with Dokploy
+
+As of 2025, Dokploy does not support environments, so create a separate project for each environment.
+
+## Domains
+
+* `tabootask.lolma.us` — production frontend (Next.js) @ `renton.lolma.us`
+* `api.tabootask.lolma.us` — production backend (Convex SDK API) @ `renton.lolma.us`
+* `http.tabootask.lolma.us` — production backend (Convex HTTP API) @ `renton.lolma.us`
+* `convex.tabootask.lolma.us` — production Convex dashboard @ `renton.lolma.us`
+* `*.tabootask-preview.lolma.us` — preview deployments for frontend (Next) and ephemeral backend (Convex) @ `renton.lolma.us`
+
+### Production environment
+
+Services:
+
+* Postgres
+    * Type: Database
+    * Image: `postgres:17`
+    * Database name: `convex`
+    * Password: generate one and save
+    * Manually create a database `convex_self_hosted` via terminal in the Posgtres container after deployment:
+
+        ```sh
+        psql -U postgres
+        ```
+
+        ```sql
+        CREATE DATABASE convex_self_hosted;
+        ```
+* Convex
+    * Type: Compose (Docker Compose)
+    * Provider: Raw
+    * `docker-compose.yml`:
+        * copy from [here](https://github.com/get-convex/convex-backend/blob/main/self-hosted/README.md#docker-configuration)
+        * add this to each service:
+
+            ```yml
+            networks:
+              - dokploy-network
+            ```
+
+        * add this to the `data` volume:
+
+            ```yml
+            driver: local
+            ```
+
+        * add this to the root:
+
+            ```yml
+            networks:
+              dokploy-network:
+                external: true
+            ```
+    * Env vars:
+
+        ```sh
+        # Unique subdomain on your domain
+        CONVEX_CLOUD_ORIGIN=https://api.tabootask.lolma.us
+
+        # Another unique subdomain on your domain
+        CONVEX_SITE_ORIGIN=https://http.tabootask.lolma.us
+
+        # Copy `Internal Connection Url` from Convex service, remove `convex` from the end
+        POSTGRES_URL=postgresql://postgres:password@convex-container-name:5432
+
+        # Localhost connections do not need encryption (SSL is not set up, so it won't work anyway)
+        DO_NOT_REQUIRE_SSL=1
+        ```
+    * Domains (service names become available after deployment):
+        * Convex SDK API
+            * Service name: `backend`
+            * Host: `api.tabootask.lolma.us`
+            * Path: `/`
+            * Internal path: `/`
+            * Container port: `3210`
+            * HTTPS: yes
+            * Certificate provider: Let's Encrypt
+        * Convex HTTP API
+            * Service name: `backend`
+            * Host: `http.tabootask.lolma.us`
+            * Path: `/`
+            * Internal path: `/`
+            * Container port: `3211`
+            * HTTPS: yes
+            * Certificate provider: Let's Encrypt
+        * Convex Dashboard
+            * Service name: `dashboard`
+            * Host: `convex.tabootask.lolma.us`
+            * Path: `/`
+            * Internal path: `/`
+            * Container port: `6791`
+            * HTTPS: yes
+            * Certificate provider: Let's Encrypt
+    * Copy admin key from terminal via:
+
+        ```sh
+        cd /convex
+        ls
+        ./generate_admin_key.hs
+        ```
+* Next
+    * Type: Application
+    * Provider: GitHub
+    * Repository: pick `tabootask` from list
+    * Branch: pick `main` from list
+    * Env vars:
+
+        ```sh
+        # Dokploy
+        NIXPACKS_INSTALL_CMD="pnpm install --frozen-lockfile"
+        NIXPACKS_BUILD_CMD="pnpm run deploy:prod && pnpm build:prod"
+        NIXPACKS_START_CMD="pnpm run serve:prod"
+
+        # Backend
+        CONVEX_SELF_HOSTED_ADMIN_KEY=convex-self-hosted|bla-bla-bla
+
+        # Frontend
+        NEXT_PUBLIC_CONVEX_URL=https://api.tabootask.lolma.us
+        ```
+
+    * Domains:
+        
+        * Web app:
+            * Domain: `tabootask.lolma.us`
+            * Path: `/`
+            * Internal path: `/`
+            * Port: `3000`
+            * HTTPS: yes
+            * Certificate provider: Let's Encrypt
